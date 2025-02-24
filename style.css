@@ -1,0 +1,135 @@
+@import url('https://fonts.googleapis.com/css2?family=Crete+Round:ital@0;1&display=swap');
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css");
+
+body {
+  margin: 0;
+  background: #1e1e1e;
+  color: white;
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+nav {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #38444d;
+}
+
+nav li {
+  font-family: "Crete Round", serif;
+  font-style: normal;
+}
+
+li {
+  float: left;
+}
+
+li a, .dropbtn {
+  display: inline-block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+li a:hover, .dropdown:hover .dropbtn {
+  background-color: #837f7f;
+}
+
+li.dropdown {
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: #2e2e2e;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  text-align: left;
+}
+
+.dropdown-content a:hover {background-color: #f1f1f1;}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.container {
+  display: flex;
+  flex: 1;
+  width: 100%;
+  height: 75vh;
+}
+
+#editor {
+  width: 75vw;
+}
+
+.player {
+  width: 25vw;
+  background-color: #2e2e2e;
+  padding: 20px;
+}
+
+.preview {
+  height: 100%;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.preview #album-art {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 13px;
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 13px;
+  transition: transform 0.3s ease;
+}
+
+#album-art.mini {
+  transform: scale(0.5);
+}
+
+.song-info #title {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.song-info #artist {
+  font-size: 1.2em;
+  margin-top: 5px;
+  color: #a0a0a0;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.controls div {
+  margin: 0 10px;
+  cursor: pointer;
+  font-size: 2em;
+}
+
+.controls div:active {
+  transform: scale(0.9);
+}

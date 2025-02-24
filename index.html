@@ -1,0 +1,38 @@
+<html>
+<head>
+  <title>Swavy Music Editor</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs/loader.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+  <nav>
+    <li><a href="#">Swavy Music Editor</a></li>
+    <li class="dropdown">
+      <a href="javascript:void(0)" class="dropbtn">File</a>
+      <div class="dropdown-content">
+        <a href="#">Save</a>
+        <a href="#">Load</a>
+      </div>
+    </li>
+  </nav>
+  <div class="container">
+    <div id="editor"></div>
+    <div class="player">
+      <div class="preview">
+        <img id="album-art" src="/assets/images/defaultAlbum.png" alt="Album Art">
+        <div class="song-info">
+          <h1 id="title">Song Title</h2>
+          <h4 id="artist">Artist</h3>
+        </div>
+        <div class="controls">
+          <div id="play"><i class="bi bi-play-circle-fill"></i></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="musicCompiler.js" type="module"></script>
+</body>
+</html>
