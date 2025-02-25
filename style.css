@@ -133,3 +133,32 @@ li.dropdown {
 .controls div:active {
   transform: scale(0.9);
 }
+
+.tab {
+  overflow: hidden;
+  background-color: #3c3c3c;
+  gap: 5px;
+}
+
+.tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  transition: 0.3s;
+  font-size: 17px;
+  color: white;
+}
+
+.tab button:hover {
+  background-color: #505050;
+}
+
+.tab button.active {
+  background-color: #575757;
+}
+
+.tab button:disabled {
+  cursor: not-allowed;
+}

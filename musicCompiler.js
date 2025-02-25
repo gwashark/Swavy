@@ -4,6 +4,7 @@ let isPlaying = false;
 let totalDuration = 0;
 let currentTime = 0;
 let playInterval;
+let isPlayable = true
 
 // Initialize Monaco Editor
 require.config({
@@ -13,6 +14,80 @@ require.config({
 });
 
 require(["vs/editor/editor.main"], function () {
+  // https://microsoft.github.io/monaco-editor/playground.html?source=v0.52.2#example-extending-language-services-model-markers-example
+  function validator(model) {
+    isPlayable = true
+    const markers = [];
+    for (let i = 1; i < model.getLineCount() + 1; i++) {
+      const range = {
+        startLineNumber: i,
+        startColumn: 1,
+        endLineNumber: i,
+        endColumn: model.getLineLength(i) + 1,
+      };
+      const content = model.getValueInRange(range).trim()
+      if (content.startsWith("NAME")) {
+        if (content.split(" ").length == 1) markers.push({
+          message: "The Song Should have a Name!",
+          severity: monaco.MarkerSeverity.Error,
+          startLineNumber: range.startLineNumber,
+          startColumn: range.startColumn,
+          endLineNumber: range.endLineNumber,
+          endColumn: range.endColumn,
+        })
+        const songName = content.replace("NAME","") || "Untitled"
+        document.querySelector("#title").innerText = songName;
+        document.title = songName + " - Swavy Music Editor"
+      } else if (content.startsWith("ARTIST")) {
+        if (content.split(" ").length == 1) markers.push({
+          message: "The Song Should have an Artist Name!",
+          severity: monaco.MarkerSeverity.Error,
+          startLineNumber: range.startLineNumber,
+          startColumn: range.startColumn,
+          endLineNumber: range.endLineNumber,
+          endColumn: range.endColumn,
+        })
+        const artistName = content.replace("ARTIST", "") || "Unknown"
+        document.querySelector("#artist").innerText = artistName;
+      } else if (content.startsWith("NOTE")) {
+        if (content.split(" ").length == 1) {
+          isPlayable = false
+          markers.push({
+            message: "Incomplete Note.",
+            severity: monaco.MarkerSeverity.Error,
+            startLineNumber: range.startLineNumber,
+            startColumn: range.startColumn,
+            endLineNumber: range.endLineNumber,
+            endColumn: range.endColumn,
+          })
+        }
+      } else if (content.startsWith("SILENCE")) {
+        if (content.split(" ").length == 1) {
+          isPlayable = false
+          markers.push({
+            message: "Incomplete Silence.",
+            severity: monaco.MarkerSeverity.Error,
+            startLineNumber: range.startLineNumber,
+            startColumn: range.startColumn,
+            endLineNumber: range.endLineNumber,
+            endColumn: range.endColumn,
+          })
+        }
+      }
+    }
+    monaco.editor.setModelMarkers(model, "owner", markers);
+  }
+
+  monaco.editor.defineTheme("swavytheme", {
+    base: "vs-dark",
+	  inherit: true,
+    rules: [],
+    colors: {
+      "editor.lineHighlightBackground": "#454545",
+      "editorLineNumber.foreground": "#59a1ff"
+    }
+  })
+
   monaco.languages.register({
     id: "swavylang",
   });
@@ -33,7 +108,7 @@ require(["vs/editor/editor.main"], function () {
   });
 
   monaco.languages.registerCompletionItemProvider("swavylang", {
-    provideCompletionItems: (model, position, context, token) => {
+    provideCompletionItems: (model, position) => {
       return {
         suggestions: [
           {
@@ -51,16 +126,45 @@ require(["vs/editor/editor.main"], function () {
     },
   });
 
+  monaco.languages.registerHoverProvider("swavylang", {
+    provideHover: function (model, position) {
+      // https://microsoft.github.io/monaco-editor/playground.html?source=v0.52.2#example-extending-language-services-hover-provider-example
+      const contents = []
+      return {
+        range: new monaco.Range(
+					1,
+					1,
+					model.getLineCount(),
+					model.getLineMaxColumn(model.getLineCount())
+				),
+        contents
+      }
+    }
+  })
+
+  const model = monaco.editor.createModel("NAME Example Song\nARTIST That team is SWAVY\n\nNOTE C4\nNOTE E4\nSILENCE 1\nNOTE G4\nSILENCE 2\nNOTE C5", "swavylang")
+
   editor = monaco.editor.create(document.getElementById("editor"), {
-    value: `NAME Example Song\nARTIST That team is SWAVY\nALBUMART default\nNOTE C4\nNOTE E4\nSILENCE 1\nNOTE G4\nSILENCE 2\nNOTE C5`,
-    language: "swavylang",
-    theme: "vs-dark",
+    theme: "swavytheme",
     fontSize: 16,
     minimap: { enabled: false },
+    model
+  });
+  validator(model)
+  model.onDidChangeContent(() => {
+    validator(model);
   });
 });
 
 document.getElementById("play").addEventListener("click", async () => {
+  if (!isPlayable) {
+    const marker = monaco.editor.getModelMarkers()[0]
+    editor.setPosition({
+      lineNumber: marker.startLineNumber,
+      column: marker.startColumn
+    })
+    return;
+  }
   if (isPlaying) {
     // Pause the music
     isPlaying = false;
@@ -93,16 +197,6 @@ document.getElementById("play").addEventListener("click", async () => {
           case "SILENCE":
             const duration = parseInt(value) * 500;
             await new Promise((resolve) => setTimeout(resolve, duration));
-            break;
-
-          case "NAME":
-            document.querySelector("#title").textContent = line.replace("NAME ", "");
-            break;
-          case "ARTIST":
-            document.querySelector("#artist").textContent = "By: " + line.replace("ARTIST ", "");
-            break;
-          case "ALBUMART":
-            // To Be Implemented
             break;
           default:
             break;
