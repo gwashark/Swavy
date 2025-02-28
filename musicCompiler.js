@@ -16,6 +16,7 @@ require.config({
 require(["vs/editor/editor.main"], function () {
   // https://microsoft.github.io/monaco-editor/playground.html?source=v0.52.2#example-extending-language-services-model-markers-example
   function validator(model) {
+    document.querySelector("#play").style.opacity = 1
     isPlayable = true
     const markers = [];
     for (let i = 1; i < model.getLineCount() + 1; i++) {
@@ -60,6 +61,18 @@ require(["vs/editor/editor.main"], function () {
             endLineNumber: range.endLineNumber,
             endColumn: range.endColumn,
           })
+        } else {
+          if (!Tone.isNote(content.replace("NOTE ", ""))) {
+            isPlayable = false
+            markers.push({
+              message: "Parameter of NOTE isn't valid.",
+              severity: monaco.MarkerSeverity.Error,
+              startLineNumber: range.startLineNumber,
+              startColumn: range.startColumn,
+              endLineNumber: range.endLineNumber,
+              endColumn: range.endColumn,
+            })
+          }
         }
       } else if (content.startsWith("SILENCE")) {
         if (content.split(" ").length == 1) {
@@ -76,6 +89,7 @@ require(["vs/editor/editor.main"], function () {
       }
     }
     monaco.editor.setModelMarkers(model, "owner", markers);
+    if (!isPlayable) document.querySelector("#play").style.opacity = 0.8
   }
 
   monaco.editor.defineTheme("swavytheme", {
@@ -120,6 +134,16 @@ require(["vs/editor/editor.main"], function () {
             label: "SILENCE",
             kind: monaco.languages.CompletionItemKind.Keyword,
             insertText: "SILENCE",
+          },
+          {
+            label: "NAME",
+            kind: monaco.languages.CompletionItemKind.Variable,
+            insertText: "NAME"
+          },
+          {
+            label: "ARTIST",
+            kind: monaco.languages.CompletionItemKind.Variable,
+            insertText: "ARTIST"
           }
         ],
       };
@@ -142,7 +166,7 @@ require(["vs/editor/editor.main"], function () {
     }
   })
 
-  const model = monaco.editor.createModel("NAME Example Song\nARTIST That team is SWAVY\n\nNOTE C4\nNOTE E4\nSILENCE 1\nNOTE G4\nSILENCE 2\nNOTE C5", "swavylang")
+  const model = monaco.editor.createModel("NAME Example Song\nARTIST Swavy Music Editor\n\nNOTE C4\nNOTE E4\nSILENCE 1\nNOTE G4\nSILENCE 2\nNOTE C5", "swavylang")
 
   editor = monaco.editor.create(document.getElementById("editor"), {
     theme: "swavytheme",
